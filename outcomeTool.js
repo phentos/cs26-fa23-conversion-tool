@@ -91,9 +91,132 @@ function parseAndDisplay() {
 function displayResults(results) {
   const resultsDiv = document.getElementById("results");
   resultsDiv.innerHTML = ""; // Clear previous results
+
   Object.keys(results).forEach((category) => {
-    let p = document.createElement("p");
-    p.textContent = `${category}: ${results[category].join(", ")}`;
-    resultsDiv.appendChild(p);
+    const columnDiv = document.createElement("div");
+    columnDiv.classList.add("column");
+    columnDiv.setAttribute("data-category", category);
+
+    const header = document.createElement("div");
+    header.classList.add("column-header");
+    header.textContent = category.toUpperCase();
+    columnDiv.appendChild(header);
+
+    results[category].forEach((course) => {
+      const courseDiv = document.createElement("div");
+      courseDiv.classList.add("draggable");
+      if (category === "uncounted") {
+        // Correctly handle 'uncounted' entries
+        courseDiv.classList.add("uncounted");
+      }
+      courseDiv.textContent = course;
+      courseDiv.setAttribute(
+        "data-outcomes",
+        JSON.stringify(new PLO().getClass(course))
+      );
+
+      if (category !== "uncounted") {
+        courseDiv.setAttribute("draggable", "true");
+        courseDiv.addEventListener("dragstart", handleDragStart);
+        // Ensure other drag-related event listeners are only added if draggable
+        courseDiv.addEventListener("dragover", handleDragOver);
+        courseDiv.addEventListener("dragenter", handleDragEnter);
+        courseDiv.addEventListener("dragleave", handleDragLeave);
+        courseDiv.addEventListener("drop", handleDrop);
+        courseDiv.addEventListener("dragend", handleDragEnd);
+      }
+
+      columnDiv.appendChild(courseDiv);
+    });
+
+    resultsDiv.appendChild(columnDiv);
+  });
+
+  // Ensure columns that are meant to accept drops have appropriate event listeners
+  [...document.querySelectorAll(".column:not(.uncounted)")].forEach(
+    (column) => {
+      column.addEventListener("dragover", handleColumnDragOver);
+      column.addEventListener("drop", handleColumnDrop);
+    }
+  );
+}
+
+function handleDragStart(e) {
+  e.dataTransfer.setData("text", e.target.textContent);
+  setTimeout(() => e.target.classList.add("hide"), 0);
+  const outcomes = JSON.parse(e.target.getAttribute("data-outcomes"));
+  if (!outcomes.includes("uncounted")) {
+    highlightCompatibleColumns(outcomes);
+  }
+}
+
+function highlightCompatibleColumns(outcomes) {
+  [...document.querySelectorAll(".column")].forEach((column) => {
+    const category = column.getAttribute("data-category");
+    if (
+      (outcomes.includes(category) || category === "electives") &&
+      category !== "uncounted"
+    ) {
+      column.classList.add("highlight");
+    }
+  });
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+}
+
+function handleDragEnter(e) {
+  e.preventDefault();
+  const outcomes = JSON.parse(e.target.getAttribute("data-outcomes"));
+  if (outcomes && outcomes.includes(this.getAttribute("data-category"))) {
+    this.classList.add("highlight");
+  }
+}
+
+function handleDragLeave(e) {
+  this.classList.remove("highlight");
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  const course = e.dataTransfer.getData("text");
+  const targetColumn = this;
+  const targetCategory = this.getAttribute("data-category");
+  if (targetCategory !== "uncounted" && !this.textContent.includes(course)) {
+    this.appendChild(
+      createDraggableElement(
+        course,
+        JSON.parse(this.getAttribute("data-outcomes")),
+        targetCategory !== "uncounted"
+      )
+    );
+  }
+  removeDuplicates(course, targetColumn);
+}
+
+function handleDragEnd(e) {
+  e.target.classList.remove("hide");
+  [...document.querySelectorAll(".highlight")].forEach((el) =>
+    el.classList.remove("highlight")
+  );
+}
+
+function createDraggableElement(course, outcomes, isDraggable) {
+  const div = document.createElement("div");
+  div.classList.add("draggable");
+  div.textContent = course;
+  if (isDraggable) {
+    div.setAttribute("draggable", "true");
+    div.setAttribute("data-outcomes", JSON.stringify(outcomes));
+    div.addEventListener("dragstart", handleDragStart);
+  }
+  return div;
+}
+
+function removeDuplicates(course, sourceColumn) {
+  [...document.querySelectorAll(".draggable")].forEach((el) => {
+    if (el.textContent === course && e1.parentNode !== sourceColumn)
+      el.remove();
   });
 }

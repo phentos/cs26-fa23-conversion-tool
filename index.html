@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Course Requirement Checker</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      #results {
+        margin-top: 20px;
+      }
+    </style>
+    <script src="outcomeTool.js"></script>
+  </head>
+  <body>
+    <h2>Enter your classes (separated by commas):</h2>
+    <input
+      type="text"
+      id="classInput"
+      placeholder="CSE 100, CSE 101, CSE 110"
+    />
+    <button onclick="parseAndDisplay()">Check Requirements</button>
+
+    <div id="results"></div>
+  </body>
+</html>

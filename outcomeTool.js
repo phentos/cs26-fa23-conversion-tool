@@ -34,6 +34,18 @@ class PLO {
   }
 }
 
+function toggleAuditTemplate() {
+  const checkbox = document.getElementById("auditCheckbox");
+  const textarea = document.getElementById("classInput");
+  const auditText = `FA23\tCOGS108\t4.00\tA+\t\t\nData Science in Practice\nSP22\tEDS 124BR\t4.00\tB+\t\t\nTeach Computational Thinking\nSP22\tLIGN165\t4.00\tB+\t\t\nComputational Linguistics`;
+
+  if (checkbox.checked) {
+    textarea.placeholder = auditText;
+  } else {
+    textarea.placeholder = "CSE 100, CSE 101, CSE 110";
+  }
+}
+
 function parseAndDisplay() {
   const input = document.getElementById("classInput").value;
   const classes = input.split(",").map((s) => s.trim());

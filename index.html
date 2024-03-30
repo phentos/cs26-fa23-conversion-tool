@@ -15,12 +15,16 @@
     <script src="outcomeTool.js"></script>
   </head>
   <body>
-    <h2>Enter your classes (separated by commas):</h2>
-    <input
-      type="text"
+    <h2>Enter classes to check</h2>
+    <label><input type="checkbox" id="auditCheckbox" onchange="toggleAuditTemplate()"> Pasting from audit?</label>
+    <br />
+    <textarea
       id="classInput"
+      rows="8"
+      cols="50"
       placeholder="CSE 100, CSE 101, CSE 110"
-    />
+    ></textarea>
+    <br />
     <button onclick="parseAndDisplay()">Check Requirements</button>
 
     <div id="results"></div>

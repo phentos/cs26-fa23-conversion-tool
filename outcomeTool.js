@@ -47,7 +47,22 @@ function toggleAuditTemplate() {
 }
 
 function parseAndDisplay() {
-  const input = document.getElementById("classInput").value;
+  const checkbox = document.getElementById("auditCheckbox");
+  let input = document.getElementById("classInput").value;
+
+  if (checkbox.checked) {
+    // Parse the audit paste format
+    const auditLines = input.split("\n");
+    const classList = [];
+    auditLines.forEach((line) => {
+      const parts = line.split("\t");
+      if (parts.length > 1 && parts[1].trim() !== "") {
+        classList.push(parts[1].trim()); // Assuming the class codes are always in the second column
+      }
+    });
+    input = classList.join(", "); // Convert array back to comma-separated string for compatibility with existing code
+  }
+
   const classes = input.split(",").map((s) => s.trim());
   const results = {
     core: [],
@@ -62,7 +77,10 @@ function parseAndDisplay() {
   classes.forEach((c) => {
     let ol = r.getClass(c);
     ol.forEach((o) => {
-      results[o].push(c);
+      if (!results[o].includes(c)) {
+        // Avoid duplicates
+        results[o].push(c);
+      }
     });
   });
 

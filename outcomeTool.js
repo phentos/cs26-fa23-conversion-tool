@@ -52,16 +52,15 @@ function parseAndDisplay() {
   let input = document.getElementById("classInput").value;
 
   if (checkbox.checked) {
-    // Parse the audit paste format
     const auditLines = input.split("\n");
     const classList = [];
     auditLines.forEach((line) => {
       const parts = line.split("\t");
       if (parts.length > 1 && parts[1].trim() !== "") {
-        classList.push(parts[1].trim()); // Assuming the class codes are always in the second column
+        classList.push(parts[1].trim());
       }
     });
-    input = classList.join(", "); // Convert array back to comma-separated string for compatibility with existing code
+    input = classList.join(", ");
   }
 
   const classes = input.split(",").map((s) => s.trim());
@@ -79,7 +78,6 @@ function parseAndDisplay() {
     let ol = r.getClass(c);
     ol.forEach((o) => {
       if (!results[o].includes(c)) {
-        // Avoid duplicates
         results[o].push(c);
       }
     });
@@ -89,134 +87,116 @@ function parseAndDisplay() {
 }
 
 function displayResults(results) {
-  const resultsDiv = document.getElementById("results");
-  resultsDiv.innerHTML = ""; // Clear previous results
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '';
 
-  Object.keys(results).forEach((category) => {
-    const columnDiv = document.createElement("div");
-    columnDiv.classList.add("column");
-    columnDiv.setAttribute("data-category", category);
+    // Create the Selection section
+    const selectionDiv = document.createElement('div');
+    selectionDiv.id = 'selection';
+    const selectionHeader = document.createElement('h3');
+    selectionHeader.textContent = 'Selection';
+    selectionDiv.appendChild(selectionHeader);
 
-    const header = document.createElement("div");
-    header.classList.add("column-header");
-    header.textContent = category.toUpperCase();
-    columnDiv.appendChild(header);
+    // Create the Result section
+    const resultDiv = document.createElement('div');
+    resultDiv.id = 'result';
+    const resultHeader = document.createElement('h3');
+    resultHeader.textContent = 'Result';
+    resultDiv.appendChild(resultHeader);
 
-    results[category].forEach((course) => {
-      const courseDiv = document.createElement("div");
-      courseDiv.classList.add("draggable");
-      if (category === "uncounted") {
-        // Correctly handle 'uncounted' entries
-        courseDiv.classList.add("uncounted");
-      }
-      courseDiv.textContent = course;
-      courseDiv.setAttribute(
-        "data-outcomes",
-        JSON.stringify(new PLO().getClass(course))
-      );
+    // Create columns for each key in Result section
+    Object.keys(results).forEach(category => {
+        const columnDiv = document.createElement('div');
+        columnDiv.classList.add('column', category);
+        columnDiv.setAttribute('data-category', category);
+        const columnHeader = document.createElement('h4');
+        columnHeader.textContent = category.toUpperCase();
+        columnDiv.appendChild(columnHeader);
+        resultDiv.appendChild(columnDiv);
 
-      if (category !== "uncounted") {
-        courseDiv.setAttribute("draggable", "true");
-        courseDiv.addEventListener("dragstart", handleDragStart);
-        // Ensure other drag-related event listeners are only added if draggable
-        courseDiv.addEventListener("dragover", handleDragOver);
-        courseDiv.addEventListener("dragenter", handleDragEnter);
-        courseDiv.addEventListener("dragleave", handleDragLeave);
-        courseDiv.addEventListener("drop", handleDrop);
-        courseDiv.addEventListener("dragend", handleDragEnd);
-      }
-
-      columnDiv.appendChild(courseDiv);
+        // Add 'core' and the input classes to the 'core' column
+        if (category === 'core') {
+            results[category].forEach(course => {
+                const courseDiv = document.createElement('div');
+                courseDiv.textContent = course;
+                columnDiv.appendChild(courseDiv);
+            });
+        }
     });
 
-    resultsDiv.appendChild(columnDiv);
-  });
+    // Populate Selection section with unique classes not in 'uncounted' or 'core'
+    const addedCourses = new Set(); // To keep track of added courses
+    Object.keys(results).forEach(category => {
+        if (category !== 'uncounted' && category !== 'core') {
+            results[category].forEach(course => {
+                if (!addedCourses.has(course)) {
+                    const courseDiv = document.createElement('div');
+                    const courseLabel = document.createElement('label');
+                    courseLabel.textContent = course;
+                    courseDiv.appendChild(courseLabel);
 
-  // Ensure columns that are meant to accept drops have appropriate event listeners
-  [...document.querySelectorAll(".column:not(.uncounted)")].forEach(
-    (column) => {
-      column.addEventListener("dragover", handleColumnDragOver);
-      column.addEventListener("drop", handleColumnDrop);
+                    const dropdown = document.createElement('select');
+                    dropdown.setAttribute('name', course);
+                    dropdown.setAttribute('onchange', 'updateResult(this)');
+
+                    // Default dropdown option
+                    const defaultOption = document.createElement('option');
+                    defaultOption.textContent = 'CHOOSE ONE';
+                    defaultOption.setAttribute('value', '');
+                    dropdown.appendChild(defaultOption);
+
+                    // Add options for each key it is present in, and 'electives'
+                    const outcomes = new PLO().getClass(course);
+                    outcomes.forEach(outcome => {
+                        if (outcome !== 'uncounted' && outcome !== 'core') {
+                            const option = document.createElement('option');
+                            option.textContent = outcome.toUpperCase();
+                            option.setAttribute('value', outcome);
+                            dropdown.appendChild(option);
+                        }
+                    });
+                    const electiveOption = document.createElement('option');
+                    electiveOption.textContent = 'ELECTIVES';
+                    electiveOption.setAttribute('value', 'electives');
+                    dropdown.appendChild(electiveOption);
+
+                    courseDiv.appendChild(dropdown);
+                    selectionDiv.appendChild(courseDiv);
+                    addedCourses.add(course); // Mark this course as added
+                }
+            });
+        }
+    });
+
+    resultsDiv.appendChild(selectionDiv);
+    resultsDiv.appendChild(resultDiv);
+}
+
+
+function updateResult(selectElement) {
+    const selectedCategory = selectElement.value;
+    const course = selectElement.name;
+    
+    // Clear course from all columns before placing it in a new one
+    document.querySelectorAll('.column').forEach(column => {
+        Array.from(column.children).forEach(child => {
+            if (child.tagName === 'DIV' && child.textContent === course) {
+                child.remove();
+            }
+        });
+    });
+    
+    if (selectedCategory) {
+        // Place course in the selected category column
+        const categoryColumn = document.querySelector(`.column.${selectedCategory}`);
+        const courseDiv = document.createElement('div');
+        courseDiv.textContent = course;
+        categoryColumn.appendChild(courseDiv);
     }
-  );
+
+    checkRequirements();
 }
 
-function handleDragStart(e) {
-  e.dataTransfer.setData("text", e.target.textContent);
-  setTimeout(() => e.target.classList.add("hide"), 0);
-  const outcomes = JSON.parse(e.target.getAttribute("data-outcomes"));
-  if (!outcomes.includes("uncounted")) {
-    highlightCompatibleColumns(outcomes);
-  }
-}
-
-function highlightCompatibleColumns(outcomes) {
-  [...document.querySelectorAll(".column")].forEach((column) => {
-    const category = column.getAttribute("data-category");
-    if (
-      (outcomes.includes(category) || category === "electives") &&
-      category !== "uncounted"
-    ) {
-      column.classList.add("highlight");
-    }
-  });
-}
-
-function handleDragOver(e) {
-  e.preventDefault();
-}
-
-function handleDragEnter(e) {
-  e.preventDefault();
-  const outcomes = JSON.parse(e.target.getAttribute("data-outcomes"));
-  if (outcomes && outcomes.includes(this.getAttribute("data-category"))) {
-    this.classList.add("highlight");
-  }
-}
-
-function handleDragLeave(e) {
-  this.classList.remove("highlight");
-}
-
-function handleDrop(e) {
-  e.preventDefault();
-  const course = e.dataTransfer.getData("text");
-  const targetColumn = this;
-  const targetCategory = this.getAttribute("data-category");
-  if (targetCategory !== "uncounted" && !this.textContent.includes(course)) {
-    this.appendChild(
-      createDraggableElement(
-        course,
-        JSON.parse(this.getAttribute("data-outcomes")),
-        targetCategory !== "uncounted"
-      )
-    );
-  }
-  removeDuplicates(course, targetColumn);
-}
-
-function handleDragEnd(e) {
-  e.target.classList.remove("hide");
-  [...document.querySelectorAll(".highlight")].forEach((el) =>
-    el.classList.remove("highlight")
-  );
-}
-
-function createDraggableElement(course, outcomes, isDraggable) {
-  const div = document.createElement("div");
-  div.classList.add("draggable");
-  div.textContent = course;
-  if (isDraggable) {
-    div.setAttribute("draggable", "true");
-    div.setAttribute("data-outcomes", JSON.stringify(outcomes));
-    div.addEventListener("dragstart", handleDragStart);
-  }
-  return div;
-}
-
-function removeDuplicates(course, sourceColumn) {
-  [...document.querySelectorAll(".draggable")].forEach((el) => {
-    if (el.textContent === course && e1.parentNode !== sourceColumn)
-      el.remove();
-  });
+function checkRequirements() {
+    
 }

@@ -1,31 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <link rel="stylesheet" href="styles.css" />
-    <meta charset="UTF-8" />
-    <title>Course Requirement Checker</title>
-    <script src="outcomeTool.js"></script>
-  </head>
-  <body>
-    <h2>Enter classes to check</h2>
-    <label
-      ><input
-        type="checkbox"
-        id="auditCheckbox"
-        onchange="toggleAuditTemplate()"
-      />
-      Pasting from audit?</label
-    >
-    <br />
-    <textarea
-      id="classInput"
-      rows="8"
-      cols="50"
-      placeholder="CSE 100, CSE 101, CSE 110"
-    ></textarea>
-    <br />
-    <button onclick="parseAndDisplay()">Check Requirements</button>
+	<head>
+		<link rel="stylesheet" href="styles.css" />
+		<meta charset="UTF-8" />
+		<title>Course Requirement Checker</title>
+		<script src="outcomeTool.js"></script>
+	</head>
+	<body>
+		<label
+			><input
+				type="checkbox"
+				id="auditCheckbox"
+				onchange="toggleAuditTemplate()"
+			/>
+			Pasting from audit?</label
+		>
+		<br />
+		<textarea
+			id="classInput"
+			rows="8"
+			cols="50"
+			placeholder="CSE 100, CSE 101, CSE 110"
+		></textarea>
+		<br />
+		<button onclick="parseAndDisplay()">Check Requirements</button>
 
-    <div id="results"></div>
-  </body>
+		<br /><br />
+		<p id="coreNeeded">Core needed: CSE 100, CSE 101, CSE 110</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Systems</th>
+					<th>Theory</th>
+					<th>Applications</th>
+					<th>Electives</th>
+					<th>Uncounted</th>
+				</tr>
+			</thead>
+			<tbody id="results"></tbody>
+		</table>
+	</body>
 </html>

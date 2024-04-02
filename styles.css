@@ -2,6 +2,7 @@ body,
 html {
 	color: black;
 	margin: 10px; /* Reset default margin */
+	color-scheme: only light;
 }
 
 #classInput {

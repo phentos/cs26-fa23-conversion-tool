@@ -13,22 +13,23 @@ function populateTable(entries) {
 	while (entries.length) {
 		let ne = entries.pop();
 		let ol = getOutcomes(ne);
-		let tb = "uncounted";
+		let tb = "electives";
+
 		for (o of ol) {
-			console.log(`${o}`);
 			let ttb = document.getElementById(`${o}Classes`);
-			console.log(`${ttb.childElementCount}`);
-			if (ttb.childElementCount < 3) {
+
+			if (o == "uncounted" ? true : ttb.childElementCount < 3) {
 				tb = o;
 				break;
 			}
 		}
+
 		addEntryToTable(ne, tb);
 	}
+	updateCounts();
 }
 
 function addEntryToTable(ne, tb) {
-	console.log(`addEntry to ${tb}`);
 	let tr = conjureRow(ne);
 	document.getElementById(`${tb}Classes`).appendChild(tr);
 }
@@ -36,26 +37,55 @@ function addEntryToTable(ne, tb) {
 function conjureRow(e) {
 	let tr = document.createElement("tr");
 	let td = document.createElement("td");
-	td.setAttribute("draggable", "true");
-	bindDrag(td);
+
 	td.textContent = e;
-	for (o of getOutcomes(e)) {
+	let ol = getOutcomes(e);
+
+	for (o of ol) {
 		td.classList.add(o);
 	}
+
+	if (!ol.includes("core") && !ol.includes("uncounted")) {
+		td.classList.add("electives");
+	}
+
+	bindEvents(td);
 	tr.appendChild(td);
 
 	return tr;
 }
 
-function bindDrag(td) {
+function bindEvents(td) {
+	if (td.classList.contains("core")) {
+		return;
+	}
+	td.setAttribute("draggable", "true");
 	td.addEventListener("dragstart", (event) => {
 		dragged = event.target;
+		toggleHighlight(event.target.classList, true);
 		event.target.classList.add("dragging");
 	});
 
 	td.addEventListener("dragend", (event) => {
 		event.target.classList.remove("dragging");
+		toggleHighlight(event.target.classList, false);
 	});
+
+	td.addEventListener("mouseenter", (event) => {
+		toggleHighlight(event.target.classList, true);
+	});
+
+	td.addEventListener("mouseleave", (event) => {
+		toggleHighlight(event.target.classList, false);
+	});
+}
+
+function toggleHighlight(cl, add) {
+	for (c of [...cl, "electives"]) {
+		add
+			? outcomeHeaders[c].classList.add("highlight")
+			: outcomeHeaders[c].classList.remove("highlight");
+	}
 }
 
 function bindDrops(th) {
@@ -86,13 +116,41 @@ function bindDrops(th) {
 
 function moveCell(where) {
 	let o = where.classList[0];
-	// document.getElementById
+
+	dragged.parentNode.removeChild(dragged);
+	document.getElementById(`${o}Classes`).appendChild(dragged);
+	dragged = null;
+
+	updateCounts();
 }
 
+const outcomeHeaders = {};
 function activateHeaderDrops() {
 	t.querySelectorAll("th").forEach((th) => {
-		bindDrops(th);
+		if (!th.classList.contains("core")) {
+			bindDrops(th);
+		}
+		outcomeHeaders[th.classList[0]] = th;
 	});
+}
+
+function updateCounts() {
+	for (o of ["core", "systems", "theory", "applications"]) {
+		setNeeds(o, 3);
+	}
+
+	setNeeds("electives", 6);
+}
+
+function setNeeds(o, req) {
+	let cc = getcc(o);
+	let r = cc >= req ? 0 : req - cc;
+	let po = o[0].toUpperCase() + o.slice(1);
+	outcomeHeaders[o].innerText = `${po} (${r} needed)`;
+}
+
+function getcc(o) {
+	return document.getElementById(`${o}Classes`).childElementCount;
 }
 
 function getClasses(o) {
@@ -113,11 +171,11 @@ function fetchParse() {
 		input = parseAudit(input);
 	}
 
-	return input.split(",").map((s) => s.trim().toUpperCase());
+	return input.split(",").map((s) => s.replaceAll(" ", "").toUpperCase());
 }
 
 function parseAudit(input) {
-	const auditLines = input.split("\n");
+	const auditLines = input.replaceAll(" ", "").split("\n");
 	const classList = [];
 	auditLines.forEach((line) => {
 		const parts = line.split("\t");
@@ -125,7 +183,7 @@ function parseAudit(input) {
 			classList.push(parts[1].trim());
 		}
 	});
-	return classList.join(", ");
+	return classList.join(",");
 }
 
 function toggleAuditTemplate() {

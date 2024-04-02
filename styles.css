@@ -4,37 +4,35 @@ html {
 	margin: 10px; /* Reset default margin */
 }
 
+td:hover {
+	background-color: rgba(127, 255, 212, 0.397);
+}
+
 #classInput {
 	width: 100%;
 }
 
-tr,
-th,
-td {
-	border: 1px solid rgb(160 160 160);
-}
-
 #results table {
-	float: left;
+	border: 1px solid rgb(160 160 160);
 	table-layout: fixed;
 	user-select: none;
 }
 
 #results table {
-	width: 50%;
-	height: 150px;
-}
-
-#results td {
-	width: 50%;
-	text-align: center;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
 }
 
 #results .uncounted {
 	width: 100%;
 }
 
-.dragover {
+#results .core {
+	width: 100%;
+	background-color: rgba(0, 0, 0, 0.05);
+}
+
+.highlight {
 	background-color: aquamarine;
 }
 

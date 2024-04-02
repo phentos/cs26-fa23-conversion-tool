@@ -4,10 +4,6 @@ html {
 	margin: 10px; /* Reset default margin */
 }
 
-td:hover {
-	background-color: rgba(127, 255, 212, 0.397);
-}
-
 #classInput {
 	width: 100%;
 }
@@ -21,6 +17,14 @@ td:hover {
 #results table {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
+}
+
+td {
+	color: black;
+}
+
+td:hover {
+	background-color: rgba(127, 255, 212, 0.397);
 }
 
 #results .uncounted {

@@ -35,7 +35,6 @@ function addEntryToTable(ne, tb) {
 }
 
 function conjureRow(e) {
-	let tr = document.createElement("tr");
 	let td = document.createElement("td");
 
 	td.textContent = e;
@@ -50,9 +49,8 @@ function conjureRow(e) {
 	}
 
 	bindEvents(td);
-	tr.appendChild(td);
 
-	return tr;
+	return td;
 }
 
 function bindEvents(td) {

@@ -1,32 +1,43 @@
 body,
 html {
-	height: 100%; /* Full height of the viewport */
-	margin: 0; /* Reset default margin */
-}
-
-body {
 	color: black;
-	display: flex;
-	justify-content: center; /* Center horizontally */
-	align-items: center; /* Center vertically */
-	flex-direction: column; /* Stack items vertically */
+	margin: 10px; /* Reset default margin */
 }
 
-td,
-tr,
-th {
-	border: 1px solid black;
-	border-collapse: collapse;
-	cursor: all-scroll;
-}
-
-table {
+#classInput {
 	width: 100%;
+}
+
+tr,
+th,
+td {
+	border: 1px solid rgb(160 160 160);
+}
+
+#results table {
+	float: left;
 	table-layout: fixed;
+	user-select: none;
+}
+
+#results table {
+	width: 50%;
+	height: 150px;
+}
+
+#results td {
+	width: 50%;
 	text-align: center;
-	border-collapse: collapse;
-	-webkit-user-select: none; /* Safari */
-	-ms-user-select: none; /* IE 10+ and Edge */
-	user-select: none; /* Standard syntax */
-	margin: 0 auto;
+}
+
+#results .uncounted {
+	width: 100%;
+}
+
+.dragover {
+	background-color: aquamarine;
+}
+
+.dragging {
+	opacity: 0.5;
 }

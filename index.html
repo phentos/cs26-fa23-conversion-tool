@@ -4,6 +4,7 @@
 		<link rel="stylesheet" href="styles.css" />
 		<meta charset="UTF-8" />
 		<title>Course Requirement Checker</title>
+		<script src="conversions.js"></script>
 		<script src="outcomeTool.js"></script>
 	</head>
 	<body>
@@ -26,18 +27,51 @@
 		<button onclick="parseAndDisplay()">Check Requirements</button>
 
 		<br /><br />
-		<p id="coreNeeded">Core needed: CSE 100, CSE 101, CSE 110</p>
-		<table>
-			<thead>
-				<tr>
-					<th>Systems</th>
-					<th>Theory</th>
-					<th>Applications</th>
-					<th>Electives</th>
-					<th>Uncounted</th>
-				</tr>
-			</thead>
-			<tbody id="results"></tbody>
-		</table>
+		<div id="results">
+			<table class="systems">
+				<thead>
+					<tr>
+						<th class="systems">Systems</th>
+					</tr>
+				</thead>
+				<tbody id="systemsClasses"></tbody>
+			</table>
+
+			<table class="theory">
+				<thead>
+					<tr>
+						<th class="theory">Theory</th>
+					</tr>
+				</thead>
+				<tbody id="theoryClasses"></tbody>
+			</table>
+
+			<table class="applications">
+				<thead>
+					<tr>
+						<th class="applications">Applications</th>
+					</tr>
+				</thead>
+				<tbody id="applicationsClasses"></tbody>
+			</table>
+
+			<table class="electives">
+				<thead>
+					<tr>
+						<th class="electives">Electives</th>
+					</tr>
+				</thead>
+				<tbody id="electivesClasses"></tbody>
+			</table>
+
+			<table class="uncounted">
+				<thead>
+					<tr>
+						<th class="uncounted">Uncounted</th>
+					</tr>
+				</thead>
+				<tbody id="uncountedClasses"></tbody>
+			</table>
+		</div>
 	</body>
 </html>

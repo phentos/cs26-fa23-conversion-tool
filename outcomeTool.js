@@ -73,10 +73,16 @@ function activateDrag(td) {
   });
 
   td.addEventListener("mouseenter", (event) => {
+    if (dragged) {
+      return;
+    }
     toggleHighlight(tdo(event), true);
   });
 
   td.addEventListener("mouseleave", (event) => {
+    if (dragged) {
+      return;
+    }
     toggleHighlight(tdo(event), false);
   });
 }

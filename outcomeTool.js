@@ -1,22 +1,26 @@
 // conversions['classToOutcomes', 'outcomeToClasses']
 let rdiv;
-let tbs;
 let dragged;
+const trackedClasses = {};
 function populateTable(entries) {
 	rdiv = document.getElementById("results");
 	activateTables();
 
 	while (entries.length) {
 		let ne = entries.pop();
-		let ol = getOutcomes(ne);
 
-		for (o of ol) {
-			let cap = o == "electives" ? 6 : 3;
+		if (!(ne in trackedClasses)) {
+			trackedClasses[ne] = true;
+			let ol = getOutcomes(ne);
 
-			if (o == "uncounted" ? true : getcc(o) < cap) {
-				let otb = document.getElementById(`${o}Classes`);
-				addEntryToTable(ne, otb);
-				break;
+			for (o of ol) {
+				let cap = o == "electives" ? 6 : 3;
+
+				if (o == "uncounted" ? true : getcc(o) < cap) {
+					let otb = document.getElementById(`${o}Classes`);
+					addEntryToTable(ne, otb);
+					break;
+				}
 			}
 		}
 	}

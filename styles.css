@@ -13,11 +13,12 @@ html {
 	border: 1px solid rgb(160 160 160);
 	table-layout: fixed;
 	user-select: none;
+	margin-bottom: 8px;
 }
 
 #results table {
 	display: grid;
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: 1fr 3fr;
 }
 
 td {
@@ -28,12 +29,7 @@ td:hover {
 	background-color: rgba(127, 255, 212, 0.397);
 }
 
-#results .uncounted {
-	width: 100%;
-}
-
 #results .core {
-	width: 100%;
 	background-color: rgba(0, 0, 0, 0.05);
 }
 

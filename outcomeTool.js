@@ -4,7 +4,7 @@ let tbs;
 let dragged;
 function populateTable(entries) {
 	rdiv = document.getElementById("results");
-	activateHeaderDrops();
+	activateTables();
 
 	while (entries.length) {
 		let ne = entries.pop();
@@ -20,7 +20,6 @@ function populateTable(entries) {
 			}
 		}
 	}
-	updateCounts();
 }
 
 /**
@@ -66,6 +65,7 @@ function activateDrag(td) {
 
 	td.addEventListener("dragend", (event) => {
 		event.target.classList.remove("dragging");
+		dragged = null;
 		toggleHighlight(tdo(event), false);
 	});
 
@@ -84,29 +84,18 @@ function activateDrag(td) {
 	});
 }
 
-function moveCell(where) {
-	let o = where.classList[0];
-
-	dragged.parentNode.removeChild(dragged);
-	document.getElementById(`${o}Classes`).appendChild(dragged);
-	dragged = null;
-
-	updateCounts();
-}
-
-const outcomeHeaders = {};
-function activateHeaderDrops() {
-	rdiv.querySelectorAll("th").forEach((th) => {
-		if (!th.classList.contains("core")) {
-			bindDrops(th);
+function activateTables() {
+	rdiv.querySelectorAll("table").forEach((table) => {
+		outcomeHeaders[table.classList[0]] = table.querySelector("th");
+		if (!table.classList.contains("core")) {
+			bindDrops(table);
 		}
-		outcomeHeaders[th.classList[0]] = th;
 	});
 }
 
 function bindDrops(el) {
 	el.addEventListener("dragover", (event) => {
-		if (dragged.classList.contains(event.target.classList[0])) {
+		if (dragged.classList.contains(el.classList[0])) {
 			event.preventDefault();
 		}
 	});
@@ -126,8 +115,16 @@ function bindDrops(el) {
 	el.addEventListener("drop", (event) => {
 		event.preventDefault();
 		event.target.classList.remove("dragover");
-		moveCell(event.target);
+		moveCell(el.querySelector("tbody"));
 	});
+}
+
+function moveCell(where) {
+	dragged.parentNode.removeChild(dragged);
+	where.appendChild(dragged);
+	dragged = null;
+
+	updateCounts();
 }
 
 /**
@@ -142,6 +139,7 @@ function toggleHighlight(ol, add) {
 	}
 }
 
+const outcomeHeaders = {};
 function updateCounts() {
 	for (o of ["core", "systems", "theory", "applications"]) {
 		setNeeds(o, 3);
@@ -187,6 +185,8 @@ function getOutcomes(c) {
  */
 function parseAndDisplay() {
 	populateTable(fetchParse());
+
+	updateCounts();
 }
 
 function fetchParse() {

@@ -247,3 +247,6 @@ const conversions = {
 		],
 	},
 };
+
+const exampleAuditText = `FA23\tCOGS108\t4.00\tA+\t\t\nData Science in Practice\nSP22\tEDS 124BR\t4.00\tB+\t\t\nTeach Computational Thinking\nSP22\tLIGN165\t4.00\tB+\t\t\nComputational Linguistics`;
+const exampleCSVtext = "CSE 100, CSE 101, CSE 110";
